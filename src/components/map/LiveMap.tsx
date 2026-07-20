@@ -17,18 +17,21 @@ L.Icon.Default.mergeOptions({
   shadowUrl:     'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 })
 
-function makeDriverIcon(stale: boolean) {
+function makeDriverIcon(stale: boolean, name: string) {
   const color = stale ? '#f59e0b' : '#22c55e'
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" width="40" height="50">
-    <circle cx="20" cy="20" r="16" fill="${color}" stroke="white" stroke-width="3"/>
-    <text x="20" y="26" text-anchor="middle" font-size="16" fill="white">🚚</text>
+  const firstName = name.split(' ')[0]
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 66" width="60" height="66">
+    <circle cx="30" cy="22" r="18" fill="${color}" stroke="white" stroke-width="3"/>
+    <text x="30" y="29" text-anchor="middle" font-size="18" fill="white">🚚</text>
+    <rect x="1" y="43" width="58" height="20" rx="4" fill="${color}" opacity="0.92"/>
+    <text x="30" y="57" text-anchor="middle" font-size="11" font-weight="bold" font-family="sans-serif" fill="white">${firstName}</text>
   </svg>`
   return L.divIcon({
     html: svg,
     className: '',
-    iconSize: [40, 50],
-    iconAnchor: [20, 50],
-    popupAnchor: [0, -50],
+    iconSize: [60, 66],
+    iconAnchor: [30, 66],
+    popupAnchor: [0, -66],
   })
 }
 
@@ -81,7 +84,7 @@ export default function LiveMap({ locations, onSelectDriver, selectedDriverId }:
           <Marker
             key={loc.driver_id}
             position={[loc.lat, loc.lng]}
-            icon={makeDriverIcon(stale)}
+            icon={makeDriverIcon(stale, driver?.full_name ?? '')}
             eventHandlers={{ click: () => onSelectDriver(loc) }}
           >
             <Popup>
