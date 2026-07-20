@@ -9,6 +9,10 @@ export const metadata: Metadata = {
   title: 'Aksara Buana — Sistem Pengantaran',
   description: 'Sistem manajemen pengantaran dan pelacakan sopir real-time',
   manifest: '/manifest.json',
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/icons/icon-192.png',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
