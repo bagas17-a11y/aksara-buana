@@ -92,18 +92,16 @@ export default function PostTripChecklist({ template, trip, driverId, currentSto
       })
     }
 
-    // Mark current stop as delivered
-    if (currentStop) {
-      await supabase.from('trip_stops').update({ status: 'delivered', delivered_at: new Date().toISOString() }).eq('id', currentStop.id)
-    }
+    // Mark all pending stops as delivered
+    await supabase
+      .from('trip_stops')
+      .update({ status: 'delivered', delivered_at: new Date().toISOString() })
+      .eq('trip_id', trip.id)
+      .neq('status', 'delivered')
 
-    // Check if all stops delivered → mark trip as delivered
-    const { data: allStops } = await supabase.from('trip_stops').select('status').eq('trip_id', trip.id)
-    const allDone = allStops?.every(s => s.status === 'delivered')
-    if (allDone) {
-      await supabase.from('trips').update({ status: 'delivered' }).eq('id', trip.id)
-      await supabase.from('driver_locations').delete().eq('driver_id', driverId)
-    }
+    // Post-checklist is the final step — always mark trip delivered
+    await supabase.from('trips').update({ status: 'delivered' }).eq('id', trip.id)
+    await supabase.from('driver_locations').delete().eq('driver_id', driverId)
 
     // Notify all admins via push
     const { data: adminProfiles } = await supabase
