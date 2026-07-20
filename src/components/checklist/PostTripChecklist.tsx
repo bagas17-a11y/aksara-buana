@@ -117,7 +117,7 @@ export default function PostTripChecklist({ template, trip, driverId, currentSto
           user_ids: adminProfiles.map(p => p.id),
           event: 'admin_delivered',
           param: currentStop?.label ?? 'Tujuan',
-          title: allDone ? 'Pengantaran Selesai' : 'Update Pengantaran',
+          title: 'Pengantaran Selesai',
           body: `${currentStop?.label ?? 'Tujuan'} telah diserahkan ke penerima.`,
           url: `/admin/trips/${trip.id}`,
         }),
