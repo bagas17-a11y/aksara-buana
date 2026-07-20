@@ -30,7 +30,8 @@ export default async function DriversPage() {
   const motoDrivers = (drivers ?? []).filter(d => d.vehicle_type === 'motorcycle')
   const otherDrivers = (drivers ?? []).filter(d => !d.vehicle_type)
 
-  function DriverCard({ driver }: { driver: typeof drivers[0] }) {
+  type DriverRow = NonNullable<typeof drivers>[number]
+  function DriverCard({ driver }: { driver: DriverRow }) {
     const isOnline = activeDriverIds.has(driver.id)
     return (
       <Card className={!driver.active ? 'opacity-60' : undefined}>

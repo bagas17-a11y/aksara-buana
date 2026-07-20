@@ -8,24 +8,33 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent } from '@/components/ui/card'
 import { Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface Stop { label: string; address: string }
 
+interface Driver {
+  id: string
+  full_name: string
+  vehicle_plate: string | null
+  vehicle_type: string | null
+  phone: string | null
+}
+
 interface Props {
-  drivers: { id: string; full_name: string; vehicle_plate: string | null }[]
+  drivers: Driver[]
   dispatcherId: string
 }
 
 export default function CreateTripForm({ drivers, dispatcherId }: Props) {
   const router = useRouter()
   const [driverId, setDriverId] = useState('')
+  const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null)
   const [customerName, setCustomerName] = useState('')
   const [customerPhone, setCustomerPhone] = useState('')
-  const [scheduledAt, setScheduledAt] = useState('')
+  const scheduledAt = new Date().toISOString()
   const [notes, setNotes] = useState('')
   const [stops, setStops] = useState<Stop[]>([{ label: '', address: '' }])
   const [saving, setSaving] = useState(false)
@@ -48,7 +57,6 @@ export default function CreateTripForm({ drivers, dispatcherId }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!driverId) { toast.error('Pilih sopir terlebih dahulu.'); return }
-    if (!scheduledAt) { toast.error('Pilih waktu keberangkatan.'); return }
     if (!customerName.trim()) { toast.error('Nama pelanggan wajib diisi.'); return }
     if (stops.some(s => !s.label || !s.address)) { toast.error('Lengkapi semua tujuan.'); return }
 
@@ -94,21 +102,27 @@ export default function CreateTripForm({ drivers, dispatcherId }: Props) {
     const { error: stopsError } = await supabase.from('trip_stops').insert(stopRows)
     if (stopsError) { toast.error(t.errorGeneric); setSaving(false); return }
 
-    // Notify assigned driver via WhatsApp + push
-    fetch('/api/notify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        user_ids: [driverId],
-        event: 'driver_assigned',
-        param: stops[0]?.label ?? 'tujuan baru',
-        title: 'Pengantaran Baru Ditugaskan',
-        body: `Anda mendapat tugas pengantaran ke ${stops[0]?.label ?? 'tujuan baru'}.`,
-        url: '/driver/dashboard',
-      }),
-    }).catch(() => {})
-
     toast.success('Pengantaran berhasil dibuat.')
+
+    // Open WhatsApp reminder if driver has a phone number
+    if (selectedDriver?.phone) {
+      const phone = selectedDriver.phone.replace(/\D/g, '').replace(/^0/, '62')
+      const stopLines = stops.map((s, i) => `${i + 1}. ${s.label} — ${s.address}`).join('\n')
+      const scheduledLabel = new Date(scheduledAt).toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+      const message = [
+        `Halo ${selectedDriver.full_name}, ada tugas pengantaran baru dari Aksara Buana:`,
+        ``,
+        `Muatan: ${[jenisCetakan, judulCetakan].filter(Boolean).join(' — ') || 'Cetakan'}`,
+        `Waktu: ${scheduledLabel} WIB`,
+        ``,
+        `Tujuan:`,
+        stopLines,
+        ``,
+        `Mohon buka aplikasi di abkurir.com untuk memulai perjalanan. Terima kasih!`,
+      ].join('\n')
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank')
+    }
+
     router.push(`/admin/trips/${trip.id}`)
   }
 
@@ -116,16 +130,26 @@ export default function CreateTripForm({ drivers, dispatcherId }: Props) {
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-1">
         <Label>{t.assignDriver}</Label>
-        <Select value={driverId} onValueChange={v => setDriverId(v ?? '')} required>
+        <Select value={driverId} onValueChange={v => { setDriverId(v ?? ''); setSelectedDriver(drivers.find(d => d.id === v) ?? null) }} required>
           <SelectTrigger>
             <SelectValue placeholder="Pilih sopir..." />
           </SelectTrigger>
           <SelectContent>
-            {drivers.map(d => (
-              <SelectItem key={d.id} value={d.id}>
-                {d.full_name} {d.vehicle_plate ? `— ${d.vehicle_plate}` : ''}
-              </SelectItem>
-            ))}
+            {['car', 'motorcycle', null].map(type => {
+              const group = drivers.filter(d => d.vehicle_type === type)
+              if (!group.length) return null
+              const label = type === 'car' ? '🚗 Sopir Mobil' : type === 'motorcycle' ? '🏍️ Sopir Motor' : '👤 Lainnya'
+              return (
+                <SelectGroup key={String(type)}>
+                  <SelectLabel>{label}</SelectLabel>
+                  {group.map(d => (
+                    <SelectItem key={d.id} value={d.id}>
+                      {d.full_name} {d.vehicle_plate ? `— ${d.vehicle_plate}` : ''}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              )
+            })}
           </SelectContent>
         </Select>
       </div>
@@ -199,11 +223,6 @@ export default function CreateTripForm({ drivers, dispatcherId }: Props) {
           <Label>No. HP Pelanggan <span className="text-muted-foreground text-xs">(opsional)</span></Label>
           <Input value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} type="tel" />
         </div>
-      </div>
-
-      <div className="space-y-1">
-        <Label>Waktu Keberangkatan <span className="text-muted-foreground text-xs font-normal">(WIB)</span></Label>
-        <Input value={scheduledAt} onChange={e => setScheduledAt(e.target.value)} type="datetime-local" required />
       </div>
 
       {/* Stops */}

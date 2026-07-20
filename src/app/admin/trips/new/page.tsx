@@ -7,7 +7,7 @@ export default async function NewTripPage() {
   const supabase = await createClient()
   const { data: drivers } = await supabase
     .from('profiles')
-    .select('id, full_name, vehicle_plate')
+    .select('id, full_name, vehicle_plate, vehicle_type, phone')
     .eq('role', 'driver')
     .eq('active', true)
     .order('full_name')

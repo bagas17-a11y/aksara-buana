@@ -7,6 +7,9 @@ import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 import { id as idLocale } from 'date-fns/locale'
 import { TripStatus } from '@/types'
+import AutoRefresh from '@/components/shared/AutoRefresh'
+
+export const dynamic = 'force-dynamic'
 
 const statusLabels: Record<TripStatus, string> = {
   assigned:       t.statusAssigned,
@@ -45,10 +48,11 @@ export default async function AdminDashboardPage() {
 
   const activeTrips   = trips?.filter(t => t.status === 'in_transit') ?? []
   const pendingTrips  = trips?.filter(t => ['assigned','pre_check_done'].includes(t.status)) ?? []
-  const completedToday = trips?.filter(t => t.status === 'completed') ?? []
+  const completedToday = trips?.filter(t => ['delivered', 'completed'].includes(t.status)) ?? []
 
   return (
     <div className="space-y-6">
+      <AutoRefresh intervalMs={30000} />
       <h1 className="text-2xl font-bold">{t.navDashboard}</h1>
 
       {/* Stats */}
