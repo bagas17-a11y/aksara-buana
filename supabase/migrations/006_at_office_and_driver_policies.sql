@@ -10,6 +10,11 @@ DROP POLICY IF EXISTS "Drivers read all active locations" ON public.driver_locat
 CREATE POLICY "Drivers read all active locations" ON public.driver_locations
   FOR SELECT USING (auth.role() = 'authenticated');
 
+-- Allow all authenticated staff to read all profiles (needed for driver name labels on map)
+DROP POLICY IF EXISTS "Drivers read all profiles" ON public.profiles;
+CREATE POLICY "Drivers read all profiles" ON public.profiles
+  FOR SELECT USING (auth.role() = 'authenticated');
+
 -- Allow drivers to update their own profile (vehicle plate)
 DROP POLICY IF EXISTS "Drivers update own profile" ON public.profiles;
 CREATE POLICY "Drivers update own profile" ON public.profiles

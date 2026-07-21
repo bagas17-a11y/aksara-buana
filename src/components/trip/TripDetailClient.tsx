@@ -157,9 +157,14 @@ export default function TripDetailClient({
               }
               <div>
                 <p className="font-medium text-sm">{stop.label}</p>
-                <p className="text-xs text-muted-foreground flex items-center gap-1">
-                  <MapPin className="h-3 w-3" />{stop.address}
-                </p>
+                <a
+                  href={`https://maps.google.com/?q=${encodeURIComponent(stop.address)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-primary flex items-center gap-1 underline underline-offset-2"
+                >
+                  <MapPin className="h-3 w-3 shrink-0" />{stop.address}
+                </a>
                 {stop.delivered_at && (
                   <p className="text-xs text-green-600 mt-0.5">
                     Selesai {format(new Date(stop.delivered_at), 'HH:mm', { locale: idLocale })} WIB
