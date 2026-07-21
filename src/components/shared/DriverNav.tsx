@@ -4,12 +4,14 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { t } from '@/lib/i18n'
-import { Home, Truck, LogOut } from 'lucide-react'
+import { Home, Truck, MapPin, UserCircle, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
-  { href: '/driver/dashboard', label: 'Beranda', icon: Home },
+  { href: '/driver/dashboard', label: 'Beranda',    icon: Home },
   { href: '/driver/trips',     label: 'Perjalanan', icon: Truck },
+  { href: '/driver/map',       label: 'Peta',       icon: MapPin },
+  { href: '/driver/profile',   label: 'Profil',     icon: UserCircle },
 ]
 
 export default function DriverNav() {

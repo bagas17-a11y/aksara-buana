@@ -132,7 +132,11 @@ export default function CreateTripForm({ drivers, dispatcherId }: Props) {
         <Label>{t.assignDriver}</Label>
         <Select value={driverId} onValueChange={v => { setDriverId(v ?? ''); setSelectedDriver(drivers.find(d => d.id === v) ?? null) }} required>
           <SelectTrigger>
-            <SelectValue placeholder="Pilih sopir..." />
+            <SelectValue placeholder="Pilih sopir...">
+              {selectedDriver
+                ? `${selectedDriver.full_name}${selectedDriver.vehicle_plate ? ` — ${selectedDriver.vehicle_plate}` : ''}`
+                : null}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {['car', 'motorcycle', null].map(type => {

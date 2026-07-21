@@ -6,13 +6,15 @@ import Link from 'next/link'
 import { format } from 'date-fns'
 import { id as idLocale } from 'date-fns/locale'
 import { TripStatus } from '@/types'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, Plus } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 const statusLabels: Record<TripStatus, string> = {
   assigned:       t.statusAssigned,
   pre_check_done: t.statusPreCheckDone,
   in_transit:     t.statusInTransit,
   delivered:      t.statusDelivered,
+  at_office:      t.statusAtOffice,
   completed:      t.statusCompleted,
   cancelled:      t.statusCancelled,
 }
@@ -31,7 +33,12 @@ export default async function DriverTripsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-bold">{t.myTrips}</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold">{t.myTrips}</h1>
+        <Link href="/driver/trips/new">
+          <Button size="sm" className="gap-1.5"><Plus className="h-4 w-4" /> Tambah</Button>
+        </Link>
+      </div>
       {!trips?.length ? (
         <Card><CardContent className="py-10 text-center text-muted-foreground">{t.noTrips}</CardContent></Card>
       ) : (

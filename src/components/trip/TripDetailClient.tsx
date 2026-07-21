@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import { Trip, ChecklistTemplate, ChecklistSubmission, TripStop } from '@/types'
 import { t } from '@/lib/i18n'
 import { Badge } from '@/components/ui/badge'
@@ -37,7 +38,13 @@ export default function TripDetailClient({
 
   const canStartTrip  = trip.status === 'pre_check_done'
   const canPostCheck  = trip.status === 'in_transit' && !postSubmission
-  const isCompleted   = ['completed', 'cancelled'].includes(trip.status)
+  const isCompleted   = ['at_office', 'completed', 'cancelled'].includes(trip.status)
+
+  async function setStatus(status: string) {
+    const supabase = createClient()
+    await supabase.from('trips').update({ status }).eq('id', trip.id)
+    router.refresh()
+  }
 
   if (view === 'pre_check' && preTemplate) {
     return (
@@ -82,7 +89,7 @@ export default function TripDetailClient({
           <p className="text-sm text-muted-foreground">{trip.customer_name}</p>
         </div>
         <Badge variant="outline" className="shrink-0 text-xs">
-          {{ assigned: 'Ditugaskan', pre_check_done: 'Siap Berangkat', in_transit: 'Dalam Perjalanan', delivered: 'Terkirim', completed: 'Selesai', cancelled: 'Dibatalkan' }[trip.status] ?? trip.status}
+          {{ assigned: 'Ditugaskan', pre_check_done: 'Siap Berangkat', in_transit: 'Dalam Perjalanan', delivered: 'Terkirim', at_office: 'Sudah di Kantor', completed: 'Selesai', cancelled: 'Dibatalkan' }[trip.status] ?? trip.status}
         </Badge>
       </div>
 
@@ -194,15 +201,11 @@ export default function TripDetailClient({
             </div>
           )}
 
-          {/* In transit: show tracking indicator + post-check option */}
+          {/* In transit: post-check + manual delivered override */}
           {trip.status === 'in_transit' && (
             <div className="space-y-3">
               {!postSubmission && (
-                <Button
-                  className="w-full h-14 text-base"
-                  variant="default"
-                  onClick={() => setView('post_check')}
-                >
+                <Button className="w-full h-14 text-base" onClick={() => setView('post_check')}>
                   {t.postCheckTitle} →
                 </Button>
               )}
@@ -212,7 +215,17 @@ export default function TripDetailClient({
                   Cek pasca-pengantaran sudah dikirim.
                 </div>
               )}
+              <Button variant="outline" className="w-full" onClick={() => setStatus('delivered')}>
+                Tandai Terkirim (Manual)
+              </Button>
             </div>
+          )}
+
+          {/* Delivered: mark as at_office */}
+          {trip.status === 'delivered' && (
+            <Button className="w-full h-14 text-base" onClick={() => setStatus('at_office')}>
+              Sudah di Kantor ✓
+            </Button>
           )}
         </div>
       )}
@@ -220,7 +233,7 @@ export default function TripDetailClient({
       {isCompleted && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground bg-gray-100 p-3 rounded-lg">
           <CheckCircle className="h-4 w-4" />
-          Perjalanan ini sudah selesai.
+          {trip.status === 'at_office' ? 'Sopir sudah kembali ke kantor.' : 'Perjalanan ini sudah selesai.'}
         </div>
       )}
     </div>

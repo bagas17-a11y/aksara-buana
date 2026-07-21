@@ -33,6 +33,7 @@ export const t = {
   statusPreCheckDone: 'Cek Pra-Perjalanan Selesai',
   statusInTransit: 'Dalam Perjalanan',
   statusDelivered: 'Terkirim',
+  statusAtOffice: 'Sudah di Kantor',
   statusCompleted: 'Selesai',
   statusCancelled: 'Dibatalkan',
 

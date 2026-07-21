@@ -1,6 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { t } from '@/lib/i18n'
 import LiveMapWrapper from '@/components/map/LiveMapWrapper'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Plus } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
@@ -19,7 +22,12 @@ export default async function MapPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">{t.mapTitle}</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">{t.mapTitle}</h1>
+        <Link href="/admin/trips/new">
+          <Button className="gap-2"><Plus className="h-4 w-4" /> Buat Pengantaran</Button>
+        </Link>
+      </div>
       <LiveMapWrapper initialLocations={locations ?? []} activeTrips={activeTrips ?? []} />
     </div>
   )

@@ -5,6 +5,7 @@ export type TripStatus =
   | 'pre_check_done'
   | 'in_transit'
   | 'delivered'
+  | 'at_office'
   | 'completed'
   | 'cancelled'
 

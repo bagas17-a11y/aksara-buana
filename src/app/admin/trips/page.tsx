@@ -16,6 +16,7 @@ const statusLabels: Record<TripStatus, string> = {
   pre_check_done: t.statusPreCheckDone,
   in_transit:     t.statusInTransit,
   delivered:      t.statusDelivered,
+  at_office:      t.statusAtOffice,
   completed:      t.statusCompleted,
   cancelled:      t.statusCancelled,
 }
@@ -25,6 +26,7 @@ const statusVariant: Record<TripStatus, 'default' | 'secondary' | 'destructive' 
   pre_check_done: 'secondary',
   in_transit:     'default',
   delivered:      'default',
+  at_office:      'secondary',
   completed:      'secondary',
   cancelled:      'destructive',
 }
