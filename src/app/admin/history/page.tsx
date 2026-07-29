@@ -2,8 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { t } from '@/lib/i18n'
 import { Badge } from '@/components/ui/badge'
 import { TripStatus } from '@/types'
-import { format } from 'date-fns'
-import { id as idLocale } from 'date-fns/locale'
+import { fmtDateTime } from '@/lib/date'
 import Link from 'next/link'
 import CsvExportButton from '@/components/shared/CsvExportButton'
 
@@ -99,7 +98,7 @@ export default async function HistoryPage({
               <tr key={trip.id} className="border-b hover:bg-gray-50">
                 <td className="px-4 py-3">
                   <Link href={`/admin/trips/${trip.id}`} className="hover:underline">
-                    {format(new Date(trip.scheduled_at), 'dd MMM yyyy HH:mm', { locale: idLocale })}
+                    {fmtDateTime(trip.scheduled_at)}
                   </Link>
                 </td>
                 <td className="px-4 py-3">{(trip.driver as {full_name:string})?.full_name}</td>

@@ -3,8 +3,7 @@ import { t } from '@/lib/i18n'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
-import { format } from 'date-fns'
-import { id as idLocale } from 'date-fns/locale'
+import { fmtDateFull, fmtDateTimeLong } from '@/lib/date'
 import { TripStatus } from '@/types'
 import { ChevronRight } from 'lucide-react'
 
@@ -43,7 +42,7 @@ export default async function DriverDashboardPage() {
     <div className="space-y-5">
       <div>
         <h1 className="text-xl font-bold">Halo, {profile?.full_name?.split(' ')[0]} 👋</h1>
-        <p className="text-sm text-muted-foreground">Hari ini: {format(new Date(), 'EEEE, dd MMMM yyyy', { locale: idLocale })}</p>
+        <p className="text-sm text-muted-foreground">Hari ini: {fmtDateFull(new Date().toISOString())}</p>
       </div>
 
       {activeTrip && (
@@ -74,7 +73,7 @@ export default async function DriverDashboardPage() {
                       <p className="font-medium">{trip.cargo_desc}</p>
                       <p className="text-sm text-muted-foreground">{trip.customer_name}</p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        {format(new Date(trip.scheduled_at), 'dd MMM, HH:mm', { locale: idLocale })}
+                        {fmtDateTimeLong(trip.scheduled_at)}
                       </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">

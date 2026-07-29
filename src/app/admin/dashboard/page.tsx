@@ -97,6 +97,47 @@ export default async function AdminDashboardPage() {
         </Card>
       </div>
 
+      {/* Active drivers */}
+      {activeLocations && activeLocations.length > 0 && (
+        <div>
+          <h2 className="text-lg font-semibold mb-3">Sopir Aktif</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {activeLocations.map((loc) => {
+              const driver = loc.driver as { full_name: string } | null
+              const driverTrip = trips?.find(tr => tr.driver_id === loc.driver_id && ['in_transit', 'pre_check_done', 'assigned', 'delivered'].includes(tr.status))
+              return (
+                <Link key={loc.driver_id} href={driverTrip ? `/admin/trips/${driverTrip.id}` : '/admin/map'}>
+                  <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                    <CardContent className="py-3 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0">
+                          {driver?.full_name?.charAt(0) ?? '?'}
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">{driver?.full_name ?? 'Sopir'}</p>
+                          {driverTrip && (
+                            <p className="text-xs text-muted-foreground truncate max-w-[140px]">
+                              {driverTrip.customer_name}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      {driverTrip ? (
+                        <Badge variant={statusVariant[driverTrip.status as TripStatus]} className="shrink-0 text-xs">
+                          {statusLabels[driverTrip.status as TripStatus]}
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="shrink-0 text-xs">Standby</Badge>
+                      )}
+                    </CardContent>
+                  </Card>
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Active trips */}
       <div>
         <div className="flex items-center justify-between mb-3">

@@ -3,8 +3,7 @@ import { t } from '@/lib/i18n'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { format } from 'date-fns'
-import { id as idLocale } from 'date-fns/locale'
+import { fmtDateTime, fmtDateTimeShort } from '@/lib/date'
 import { TripStatus } from '@/types'
 import { Plus } from 'lucide-react'
 import AutoRefresh from '@/components/shared/AutoRefresh'
@@ -76,7 +75,7 @@ export default async function TripsPage() {
                 <tr key={trip.id} className="border-b hover:bg-gray-50 cursor-pointer">
                   <td className="px-4 py-3">
                     <Link href={`/admin/trips/${trip.id}`} className="block">
-                      {format(new Date(trip.scheduled_at), 'dd MMM yyyy HH:mm', { locale: idLocale })}
+                      {fmtDateTime(trip.scheduled_at)}
                     </Link>
                   </td>
                   <td className="px-4 py-3">
@@ -95,7 +94,7 @@ export default async function TripsPage() {
                   </td>
                   <td className="px-4 py-3 text-sm text-green-700 dark:text-green-400">
                     {completedAt
-                      ? <Link href={`/admin/trips/${trip.id}`} className="block">{format(new Date(completedAt), 'dd MMM HH:mm', { locale: idLocale })}</Link>
+                      ? <Link href={`/admin/trips/${trip.id}`} className="block">{fmtDateTimeShort(completedAt)}</Link>
                       : <span className="text-muted-foreground">—</span>}
                   </td>
                   <td className="px-4 py-3">

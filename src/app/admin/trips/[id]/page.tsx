@@ -4,8 +4,7 @@ import { t } from '@/lib/i18n'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { TripStatus } from '@/types'
-import { format } from 'date-fns'
-import { id as idLocale } from 'date-fns/locale'
+import { fmtDateTime, fmtTime } from '@/lib/date'
 import TripStatusActions from '@/components/trip/TripStatusActions'
 import WhatsAppReminder from '@/components/trip/WhatsAppReminder'
 import ChecklistAnswersSection from '@/components/admin/ChecklistAnswersSection'
@@ -87,7 +86,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
           <p className="text-sm text-green-800 dark:text-green-200 font-medium">
             ✓ Selesai diantar pada{' '}
             <span className="font-bold">
-              {format(new Date(completedAt), 'dd MMM yyyy HH:mm', { locale: idLocale })} WIB
+              {fmtDateTime(completedAt)} WIB
             </span>
           </p>
         </div>
@@ -105,7 +104,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
               phone={driver.phone}
               driverName={driver.full_name}
               stops={stops.sort((a, b) => a.sequence - b.sequence).map(s => ({ label: s.label, address: s.address }))}
-              scheduledAt={format(new Date(trip.scheduled_at), 'dd MMM yyyy HH:mm', { locale: idLocale })}
+              scheduledAt={fmtDateTime(trip.scheduled_at)}
               cargoDesc={trip.cargo_desc}
             />
           </div>
@@ -119,7 +118,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
         <p><span className="text-muted-foreground w-28 inline-block">Pelanggan</span>{trip.customer_name}</p>
         {trip.customer_phone && <p><span className="text-muted-foreground w-28 inline-block">No. HP</span>{trip.customer_phone}</p>}
         <p><span className="text-muted-foreground w-28 inline-block">Dibuat</span>
-          {format(new Date(trip.scheduled_at), 'dd MMM yyyy HH:mm', { locale: idLocale })} WIB
+          {fmtDateTime(trip.scheduled_at)} WIB
         </p>
         {trip.notes && <p><span className="text-muted-foreground w-28 inline-block">Catatan</span>{trip.notes}</p>}
       </section>
@@ -136,7 +135,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
                 <p className="text-sm text-muted-foreground">{stop.address}</p>
                 {stop.delivered_at && (
                   <p className="text-xs text-green-600 dark:text-green-400 mt-0.5">
-                    Selesai {format(new Date(stop.delivered_at), 'HH:mm', { locale: idLocale })} WIB
+                    Selesai {fmtTime(stop.delivered_at)} WIB
                   </p>
                 )}
               </div>
@@ -157,7 +156,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium">Sebelum Pengiriman</span>
             <Badge variant={preCheck ? 'default' : 'outline'} className="text-xs">
-              {preCheck ? `Selesai ${format(new Date(preCheck.submitted_at), 'HH:mm', { locale: idLocale })} WIB` : 'Belum'}
+              {preCheck ? `Selesai ${fmtTime(preCheck.submitted_at)} WIB` : 'Belum'}
             </Badge>
           </div>
           {preCheck && preTemplate && (
@@ -177,7 +176,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium">Setelah Pengiriman</span>
             <Badge variant={postCheck ? 'default' : 'outline'} className="text-xs">
-              {postCheck ? `Selesai ${format(new Date(postCheck.submitted_at), 'HH:mm', { locale: idLocale })} WIB` : 'Belum'}
+              {postCheck ? `Selesai ${fmtTime(postCheck.submitted_at)} WIB` : 'Belum'}
             </Badge>
           </div>
           {postCheck && postTemplate && (

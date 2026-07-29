@@ -3,8 +3,7 @@ import { t } from '@/lib/i18n'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
-import { format } from 'date-fns'
-import { id as idLocale } from 'date-fns/locale'
+import { fmtDateTimeLong } from '@/lib/date'
 import { TripStatus } from '@/types'
 import { ChevronRight, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -51,7 +50,7 @@ export default async function DriverTripsPage() {
                     <p className="font-medium">{trip.cargo_desc}</p>
                     <p className="text-sm text-muted-foreground">{trip.customer_name}</p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {format(new Date(trip.scheduled_at), 'dd MMM yyyy, HH:mm', { locale: idLocale })}
+                      {fmtDateTimeLong(trip.scheduled_at)}
                     </p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">

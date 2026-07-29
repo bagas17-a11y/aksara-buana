@@ -8,8 +8,7 @@ import { t } from '@/lib/i18n'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { format } from 'date-fns'
-import { id as idLocale } from 'date-fns/locale'
+import { fmtDateTimeLong, fmtTime } from '@/lib/date'
 import { MapPin, CheckCircle, Circle, Navigation, Phone, FileText } from 'lucide-react'
 import PreTripChecklist from '@/components/checklist/PreTripChecklist'
 import PostTripChecklist from '@/components/checklist/PostTripChecklist'
@@ -99,7 +98,7 @@ export default function TripDetailClient({
           <p className="font-semibold mb-1 flex items-center gap-1.5"><FileText className="h-4 w-4" /> Detail Pengiriman</p>
           <div className="grid grid-cols-[120px_1fr] gap-y-1.5 text-sm">
             <span className="text-muted-foreground">Dibuat</span>
-            <span>{format(new Date(trip.scheduled_at), 'dd MMM yyyy, HH:mm', { locale: idLocale })} WIB</span>
+            <span>{fmtDateTimeLong(trip.scheduled_at)} WIB</span>
             <span className="text-muted-foreground">Pelanggan</span>
             <span>{trip.customer_name}</span>
             {(trip as any).customer_phone && <>
@@ -167,7 +166,7 @@ export default function TripDetailClient({
                 </a>
                 {stop.delivered_at && (
                   <p className="text-xs text-green-600 mt-0.5">
-                    Selesai {format(new Date(stop.delivered_at), 'HH:mm', { locale: idLocale })} WIB
+                    Selesai {fmtTime(stop.delivered_at)} WIB
                   </p>
                 )}
               </div>

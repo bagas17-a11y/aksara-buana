@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { createDriverTrip } from '@/app/driver/trips/new/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -39,32 +39,19 @@ export default function DriverCreateTripForm({ driverId, driverName }: Props) {
     if (stops.some(s => !s.label || !s.address)) { toast.error('Lengkapi semua tujuan.'); return }
 
     setSaving(true)
-    const supabase = createClient()
 
-    const { data: trip, error } = await supabase
-      .from('trips')
-      .insert({
-        driver_id:     driverId,
-        dispatcher_id: driverId,
-        cargo_desc:    cargodesc || 'Cetakan',
-        customer_name: customerName,
-        customer_phone: customerPhone || null,
-        scheduled_at:  new Date().toISOString(),
-        notes:         notes || null,
-        status:        'assigned',
-      })
-      .select()
-      .single()
+    const result = await createDriverTrip({
+      customerName,
+      customerPhone: customerPhone || null,
+      cargoDesc: cargodesc,
+      notes: notes || null,
+      stops,
+    })
 
-    if (error || !trip) { toast.error('Gagal membuat pengantaran.'); setSaving(false); return }
-
-    const { error: stopsErr } = await supabase.from('trip_stops').insert(
-      stops.map((s, i) => ({ trip_id: trip.id, sequence: i + 1, label: s.label, address: s.address, status: 'pending' }))
-    )
-    if (stopsErr) { toast.error('Gagal menyimpan tujuan.'); setSaving(false); return }
+    if ('error' in result) { toast.error(result.error); setSaving(false); return }
 
     toast.success('Pengantaran berhasil dibuat.')
-    router.push(`/driver/trips/${trip.id}`)
+    router.push(`/driver/trips/${result.tripId}`)
   }
 
   return (
